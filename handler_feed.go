@@ -16,7 +16,6 @@ func (apiCfg *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Reques
 		URL  string `json:"url"`
 	}
 	decoder := json.NewDecoder(r.Body)
-
 	params := parameters{}
 	err := decoder.Decode(&params)
 	if err != nil {
@@ -28,9 +27,9 @@ func (apiCfg *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Reques
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
+		UserID:    user.ID,
 		Name:      params.Name,
 		Url:       params.URL,
-		UserID:    user.ID,
 	})
 	if err != nil {
 		respondWithError(w, 400, fmt.Sprintf("Couldn't create feed: %v", err))
