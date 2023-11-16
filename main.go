@@ -1,7 +1,53 @@
 package main
 
-import "fmt"
+import (
+	"log"
+	"net/http"
+	"os"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
+	"github.com/joho/godotenv"
+)
 
 func main() {
-	fmt.Println("Hello World!")
+	godotenv.Load()
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal("PORT environment variable is not set")
+	}
+
+	r := chi.NewRouter()
+
+	r.Use(middleware.Logger)
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
+
+	v1Router := chi.NewRouter()
+
+	v1Router.Get("/healthz", handlerReadiness)
+	v1Router.Get("/err", handleErr)
+
+	r.Mount("/v1", v1Router)
+
+	srv := &http.Server{
+		Handler: r,
+		Addr:    ":" + port,
+	}
+
+	log.Printf("Serving on PORT:%v", port)
+
+	err := srv.ListenAndServe()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
