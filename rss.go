@@ -14,7 +14,7 @@ type RSSFeed struct {
 		Description string    `xml:"description"`
 		Language    string    `xml:"language"`
 		Item        []RSSItem `xml:"item"`
-	} `xml:"c hannel"`
+	} `xml:"channel"`
 }
 
 type RSSItem struct {
